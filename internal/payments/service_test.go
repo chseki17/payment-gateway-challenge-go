@@ -58,6 +58,8 @@ func validPaymentRequest() payments.PaymentRequest {
 }
 
 func TestService_CreatePayment_ValidationError(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{}
 	bank := &mockBankingSimulator{}
 
@@ -76,6 +78,8 @@ func TestService_CreatePayment_ValidationError(t *testing.T) {
 }
 
 func TestService_CreatePayment_BankError(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{}
 	bank := &mockBankingSimulator{
 		authorizeFn: func(ctx context.Context, req simulator.AuthorizationRequest) (*simulator.AuthorizationResponse, error) {
@@ -92,6 +96,8 @@ func TestService_CreatePayment_BankError(t *testing.T) {
 }
 
 func TestService_CreatePayment_Authorized(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{
 		addFn: func(ctx context.Context, p *payments.Payment) error {
 			require.Equal(t, payments.StatusAuthorized, p.Status)
@@ -127,6 +133,8 @@ func TestService_CreatePayment_Authorized(t *testing.T) {
 }
 
 func TestService_CreatePayment_Declined(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{
 		addFn: func(ctx context.Context, p *payments.Payment) error {
 			require.Equal(t, payments.StatusDeclined, p.Status)
@@ -149,6 +157,8 @@ func TestService_CreatePayment_Declined(t *testing.T) {
 }
 
 func TestService_CreatePayment_RepositoryError(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{
 		addFn: func(ctx context.Context, p *payments.Payment) error {
 			return errors.New("db error")
@@ -170,6 +180,8 @@ func TestService_CreatePayment_RepositoryError(t *testing.T) {
 }
 
 func TestService_GetPayment(t *testing.T) {
+	t.Parallel()
+
 	expected := &payments.Payment{ID: "123"}
 
 	repo := &mockPaymentsRepository{

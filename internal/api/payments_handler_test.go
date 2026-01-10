@@ -41,6 +41,8 @@ func (m *mockBankingSimulator) Authorize(
 }
 
 func TestPaymentsHandler_PostHandler_Authorized(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{
 		addFn: func(ctx context.Context, p *payments.Payment) error {
 			require.Equal(t, payments.StatusAuthorized, p.Status)
@@ -81,6 +83,8 @@ func TestPaymentsHandler_PostHandler_Authorized(t *testing.T) {
 }
 
 func TestPaymentsHandler_PostHandler_Declined(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{
 		addFn: func(ctx context.Context, p *payments.Payment) error {
 			require.Equal(t, payments.StatusDeclined, p.Status)
@@ -117,6 +121,8 @@ func TestPaymentsHandler_PostHandler_Declined(t *testing.T) {
 }
 
 func TestPaymentsHandler_PostHandler_InvalidJSON(t *testing.T) {
+	t.Parallel()
+
 	svc := payments.NewService(nil, nil)
 
 	handler := api.NewPaymentsHandler(svc)
@@ -133,6 +139,8 @@ func TestPaymentsHandler_PostHandler_InvalidJSON(t *testing.T) {
 }
 
 func TestPaymentsHandler_PostHandler_BankError(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{}
 	bank := &mockBankingSimulator{
 		authorizeFn: func(ctx context.Context, req simulator.AuthorizationRequest) (*simulator.AuthorizationResponse, error) {
@@ -163,6 +171,8 @@ func TestPaymentsHandler_PostHandler_BankError(t *testing.T) {
 }
 
 func TestPaymentsHandler_GetHandler_Found(t *testing.T) {
+	t.Parallel()
+
 	repo := &mockPaymentsRepository{
 		getFn: func(ctx context.Context, id string) (*payments.Payment, error) {
 			return &payments.Payment{ID: id}, nil

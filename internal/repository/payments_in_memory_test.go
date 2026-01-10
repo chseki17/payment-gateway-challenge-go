@@ -11,6 +11,8 @@ import (
 )
 
 func TestPaymentsRepositoryInMemory_AddAndGet(t *testing.T) {
+	t.Parallel()
+
 	repo := repository.NewPaymentsRepositoryInMemory()
 
 	payment := &payments.Payment{
@@ -33,6 +35,8 @@ func TestPaymentsRepositoryInMemory_AddAndGet(t *testing.T) {
 }
 
 func TestPaymentsRepositoryInMemory_ConcurrentAdd(t *testing.T) {
+	t.Parallel()
+
 	repo := repository.NewPaymentsRepositoryInMemory()
 
 	const workers = 50
@@ -59,6 +63,8 @@ func TestPaymentsRepositoryInMemory_ConcurrentAdd(t *testing.T) {
 }
 
 func TestPaymentsRepositoryInMemory_IdempotencyKey(t *testing.T) {
+	t.Parallel()
+
 	repo := repository.NewPaymentsRepositoryInMemory()
 	ctx := context.Background()
 

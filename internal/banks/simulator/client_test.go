@@ -14,6 +14,8 @@ import (
 )
 
 func TestClient_Authorize_Success(t *testing.T) {
+	t.Parallel()
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		require.Equal(t, "/payments", r.URL.Path)
