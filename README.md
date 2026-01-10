@@ -35,10 +35,11 @@ curl -v -X 'POST' \                          gorila-eks-prod
 - rejected [x]
 - currency business rules [x] contract enforcement!!!
 - idempotency key [x] ???
+- ci/cd [x] with build and tests containerized
+- e2e [x]
 
-- ci/cd [] with build and tests containerized
-
-- e2e []
+- properly documents every design decision !!!!! everything!!
+- properly documents what I left intentionally !!!! everything!!
 
 - include logging requestID middleware, that injects it an ID to facilitate troubleshooting [troubleshooting, production readiness]
 - include recoverer middleware, that recover the api in case of panics returning internal error instead of crashing [troubleshooting, production readiness]
