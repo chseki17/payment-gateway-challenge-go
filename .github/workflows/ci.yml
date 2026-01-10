@@ -34,7 +34,7 @@ jobs:
       # -------------------------
       # Unit + integration tests
       # -------------------------
-      - name: Run tests (verbose + race)
+      - name: Run unit & integration tests (verbose + race)
         run: |
           docker run --rm \
             -v "$PWD":/app \
