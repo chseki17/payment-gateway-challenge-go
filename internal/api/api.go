@@ -78,22 +78,11 @@ func (a *Api) setupRouter() {
 	a.router.Get("/swagger/*", a.SwaggerHandler())
 
 	a.router.Route("/api/v1", func(r chi.Router) {
-		r.Use(apiVersionCtx("v1"))
-
 		r.Get("/ping", a.PingHandler())
 
 		r.Get("/payments/{id}", a.paymentsHandler.GetHandler())
 		r.Post("/payments", a.paymentsHandler.PostHandler())
 	})
-}
-
-func apiVersionCtx(version string) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r = r.WithContext(context.WithValue(r.Context(), "api.version", version))
-			next.ServeHTTP(w, r)
-		})
-	}
 }
 
 type pong struct {
