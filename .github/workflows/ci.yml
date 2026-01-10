@@ -60,5 +60,5 @@ jobs:
       # -------------------------
       - name: Verify Swagger docs are up to date
         run: |
-          docker compose run --rm swagger
+          docker compose run --rm swagger-gen-docs
           git diff --exit-code
