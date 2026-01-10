@@ -55,3 +55,26 @@ func (c *TestClient) Post(
 	data, err := io.ReadAll(resp.Body)
 	return resp, data, err
 }
+
+func (c *TestClient) Get(
+	ctx context.Context,
+	path string,
+	out any,
+) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
