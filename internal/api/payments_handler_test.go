@@ -120,6 +120,31 @@ func TestPaymentsHandler_PostHandler_Declined(t *testing.T) {
 	require.Equal(t, http.StatusOK, rec.Code)
 }
 
+func TestPaymentsHandler_PostHandler_Rejected(t *testing.T) {
+	t.Parallel()
+
+	svc := payments.NewService(nil, nil)
+
+	handler := api.NewPaymentsHandler(svc)
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/payments",
+		bytes.NewBufferString(`{
+			"card_number":"4111111111111111",
+			"expiry_month":4,
+			"expiry_year":2024,
+			"currency":"USD",
+			"amount":1000,
+			"cvv":"123"
+		}`),
+	)
+	rec := httptest.NewRecorder()
+
+	handler.PostHandler().ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusBadRequest, rec.Code)
+}
+
 func TestPaymentsHandler_PostHandler_InvalidJSON(t *testing.T) {
 	t.Parallel()
 
