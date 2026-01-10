@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -13,7 +14,12 @@ import (
 func TestPayments_AuthorizationBehavior(t *testing.T) {
 	t.Parallel()
 
-	client := NewTestClient("http://localhost:8090")
+	apiURL := os.Getenv("TEST_API_BASE_URL")
+	if apiURL == "" {
+		apiURL = "http://localhost:8090"
+	}
+
+	client := NewTestClient(apiURL)
 
 	type response struct {
 		ID     string `json:"id"`

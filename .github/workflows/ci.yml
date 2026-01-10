@@ -53,15 +53,11 @@ jobs:
       # -------------------------
       # E2E tests
       # -------------------------
-      - name: Start stack - compose build (E2E)
-        run: |
-          docker compose build
-
-      - name: Start stack - compose up (E2E)
+      - name: Start stack (E2E)
         run: |
           docker compose up -d
 
-      - name: Wait for API to be healthy
+      - name: Wait for API to be healthy (E2E)
         run: |
           for i in {1..30}; do
             if curl -sf -o /dev/null http://localhost:8090/api/v1/ping; then
@@ -75,15 +71,19 @@ jobs:
           docker compose logs
           exit 1
 
-      - name: Run E2E tests
+      - name: Run tests (E2E)
+        env:
+          TEST_API_BASE_URL: http://api:8090
         run: |
           docker run --rm \
+            --network container:$(docker compose ps -q api) \
             -v "$PWD":/app \
             -w /app \
+            -e TEST_API_BASE_URL=$TEST_API_BASE_URL \
             golang:1.24.0 \
             go test -v ./test/e2e/...
 
-      - name: Tear down stack
+      - name: Tear down stack (E2E)
         if: always()
         run: |
           docker compose down -v
