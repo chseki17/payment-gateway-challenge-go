@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/cko-recruitment/payment-gateway-challenge-go/docs"
 	"github.com/cko-recruitment/payment-gateway-challenge-go/internal/api"
+	"github.com/cko-recruitment/payment-gateway-challenge-go/internal/banks/simulator"
+	"github.com/cko-recruitment/payment-gateway-challenge-go/internal/config"
+	"github.com/cko-recruitment/payment-gateway-challenge-go/internal/payments"
+	"github.com/cko-recruitment/payment-gateway-challenge-go/internal/repository"
 )
 
 var (
@@ -25,16 +30,14 @@ var (
 
 // @securityDefinitions.basic	BasicAuth
 func main() {
+	conf, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("error loading environment variables: %v", err)
+	}
+
 	fmt.Printf("version %s, commit %s, built at %s\n", version, commit, date)
 	docs.SwaggerInfo.Version = version
 
-	err := run()
-	if err != nil {
-		fmt.Printf("fatal API error: %v\n", err)
-	}
-}
-
-func run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
@@ -54,10 +57,15 @@ func run() error {
 		}
 	}()
 
-	api := api.New()
-	if err := api.Run(ctx, ":8090"); err != nil {
-		return err
-	}
+	paymentsRepository := repository.NewPaymentsRepositoryInMemory()
 
-	return nil
+	bankSimulator := simulator.NewClient(conf.BankSimulator.URL, nil)
+	paymentsSvc := payments.NewService(paymentsRepository, bankSimulator)
+
+	paymentsHandler := api.NewPaymentsHandler(paymentsSvc)
+	api := api.New(paymentsHandler)
+
+	if err := api.Run(ctx, ":8090"); err != nil {
+		log.Fatalf("error setup the API: %v", err)
+	}
 }

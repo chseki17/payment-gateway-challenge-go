@@ -8,28 +8,215 @@
     "host": "localhost:8090",
     "basePath": "/",
     "paths": {
-        "/ping": {
-            "get": {
+        "/api/v1/payments": {
+            "post": {
+                "description": "Creates a new payment and authorizes it with the bank\nAmount must be expressed in minor units of the currency (e.g. 1099 = $10.99 USD).\nThe only currencies supported for now are USD, EUR, and BRL (ISO 4217).\nIdempotency key used to safely retry payment requests without creating duplicate payments. It is recommended to use a UUID (v4 or v7) or another unique, random value to avoid collisions.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Create a payment",
+                "parameters": [
+                    {
+                        "description": "Payment request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payments.PaymentRequest"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.Pong"
+                            "$ref": "#/definitions/payments.Payment"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseBody"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseBody"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/payments/{id}": {
+            "get": {
+                "description": "Retrieves a payment by its unique identifier",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Get payment by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Payment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/payments.Payment"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseBody"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseBody"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ping": {
+            "get": {
+                "description": "Simple health check endpoint used to verify service availability",
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "204": {
+                        "description": "Service is healthy"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "main.Pong": {
+        "api.ErrorResponseBody": {
             "type": "object",
             "properties": {
-                "message": {
+                "error": {
                     "type": "string"
+                }
+            }
+        },
+        "payments.Payment": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "Amount expressed in minor units of the given currency. Example: $10.99 USD → 1099",
+                    "type": "integer",
+                    "example": 1000
+                },
+                "card_number_last_four": {
+                    "description": "Last four digits of the card number used in the payment.",
+                    "type": "string",
+                    "example": "8877"
+                },
+                "currency": {
+                    "description": "Currency code in ISO 4217 format (e.g. USD, EUR, BRL).",
+                    "type": "string",
+                    "enum": [
+                        "USD",
+                        "EUR",
+                        "BRL"
+                    ],
+                    "example": "USD"
+                },
+                "expiry_month": {
+                    "description": "Expiration month (1–12).",
+                    "type": "integer",
+                    "example": 12
+                },
+                "expiry_year": {
+                    "description": "Expiration year (four digits).",
+                    "type": "integer",
+                    "example": 2050
+                },
+                "id": {
+                    "description": "Unique identifier of the payment.",
+                    "type": "string",
+                    "example": "019ba901-48a1-7138-824e-d0e65a8dc38a"
+                },
+                "status": {
+                    "description": "Current status of the payment.",
+                    "type": "string",
+                    "enum": [
+                        "authorized",
+                        "declined",
+                        "rejected",
+                        "pending"
+                    ],
+                    "example": "authorized"
+                }
+            }
+        },
+        "payments.PaymentRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "Amount expressed in minor units of the given currency. Example: $10.99 USD → 1099",
+                    "type": "integer",
+                    "example": 1000
+                },
+                "card_number": {
+                    "description": "Card number containing between 14 and 19 digits.",
+                    "type": "string",
+                    "example": "2222405343248877"
+                },
+                "currency": {
+                    "description": "Currency code in ISO 4217 format (e.g. USD, EUR, BRL).",
+                    "type": "string",
+                    "enum": [
+                        "USD",
+                        "EUR",
+                        "BRL"
+                    ],
+                    "example": "USD"
+                },
+                "cvv": {
+                    "description": "Card verification value (3 or 4 digits).",
+                    "type": "string",
+                    "example": "123"
+                },
+                "expiry_month": {
+                    "description": "Expiration month (1–12).",
+                    "type": "integer",
+                    "example": 12
+                },
+                "expiry_year": {
+                    "description": "Expiration year (four digits).",
+                    "type": "integer",
+                    "example": 2050
+                },
+                "idempotency_key": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
                 }
             }
         }

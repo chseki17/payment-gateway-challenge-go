@@ -1,25 +1,166 @@
 basePath: /
 definitions:
-  main.Pong:
+  api.ErrorResponseBody:
     properties:
-      message:
+      error:
         type: string
     type: object
-host: localhost:8089
+  payments.Payment:
+    properties:
+      amount:
+        description: 'Amount expressed in minor units of the given currency. Example:
+          $10.99 USD → 1099'
+        example: 1000
+        type: integer
+      card_number_last_four:
+        description: Last four digits of the card number used in the payment.
+        example: "8877"
+        type: string
+      currency:
+        description: Currency code in ISO 4217 format (e.g. USD, EUR, BRL).
+        enum:
+        - USD
+        - EUR
+        - BRL
+        example: USD
+        type: string
+      expiry_month:
+        description: Expiration month (1–12).
+        example: 12
+        type: integer
+      expiry_year:
+        description: Expiration year (four digits).
+        example: 2050
+        type: integer
+      id:
+        description: Unique identifier of the payment.
+        example: 019ba901-48a1-7138-824e-d0e65a8dc38a
+        type: string
+      status:
+        description: Current status of the payment.
+        enum:
+        - authorized
+        - declined
+        - rejected
+        - pending
+        example: authorized
+        type: string
+    type: object
+  payments.PaymentRequest:
+    properties:
+      amount:
+        description: 'Amount expressed in minor units of the given currency. Example:
+          $10.99 USD → 1099'
+        example: 1000
+        type: integer
+      card_number:
+        description: Card number containing between 14 and 19 digits.
+        example: "2222405343248877"
+        type: string
+      currency:
+        description: Currency code in ISO 4217 format (e.g. USD, EUR, BRL).
+        enum:
+        - USD
+        - EUR
+        - BRL
+        example: USD
+        type: string
+      cvv:
+        description: Card verification value (3 or 4 digits).
+        example: "123"
+        type: string
+      expiry_month:
+        description: Expiration month (1–12).
+        example: 12
+        type: integer
+      expiry_year:
+        description: Expiration year (four digits).
+        example: 2050
+        type: integer
+      idempotency_key:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+host: localhost:8090
 info:
   contact: {}
   description: Interview challenge for building a Payment Gateway - Go version
   title: Payment Gateway Challenge Go
 paths:
-  /ping:
-    get:
+  /api/v1/payments:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Creates a new payment and authorizes it with the bank
+        Amount must be expressed in minor units of the currency (e.g. 1099 = $10.99 USD).
+        The only currencies supported for now are USD, EUR, and BRL (ISO 4217).
+        Idempotency key used to safely retry payment requests without creating duplicate payments. It is recommended to use a UUID (v4 or v7) or another unique, random value to avoid collisions.
+      parameters:
+      - description: Payment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/payments.PaymentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Pong'
+            $ref: '#/definitions/payments.Payment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponseBody'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponseBody'
+      summary: Create a payment
+      tags:
+      - payments
+  /api/v1/payments/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a payment by its unique identifier
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/payments.Payment'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponseBody'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponseBody'
+      summary: Get payment by ID
+      tags:
+      - payments
+  /api/v1/ping:
+    get:
+      description: Simple health check endpoint used to verify service availability
+      responses:
+        "204":
+          description: Service is healthy
+        "500":
+          description: Internal server error
+      summary: Health check
+      tags:
+      - health
 securityDefinitions:
   BasicAuth:
     type: basic

@@ -1,9 +1,15 @@
 module github.com/cko-recruitment/payment-gateway-challenge-go
 
-go 1.21
+go 1.24.0
+
+toolchain go1.24.3
 
 require (
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/chi/v5 v5.1.0
+	github.com/go-chi/httplog/v3 v3.3.0
+	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/swaggo/http-swagger v1.3.4
 )
 
@@ -24,9 +30,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/swag v1.16.2
-	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sync v0.19.0
+	golang.org/x/tools v0.39.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
