@@ -82,6 +82,8 @@ Several best practices were applied to improve reliability, debuggability, and o
 
 - A configuration layer was added to centralize environment variables such as the server port and external dependencies like the Bank Simulator URL.
 
+- The existing GoReleaser configuration was extended and integrated into the CI setup to automatically generate releases and changelogs.
+
 - The API was versioned so that all endpoints are exposed under /v1. This makes future evolution of the API easier and avoids breaking existing clients.
 
 ## What I Intentionally Skipped
