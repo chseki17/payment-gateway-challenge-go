@@ -62,7 +62,6 @@ type Payment struct {
 	ExpiryYear         int           `json:"expiry_year" example:"2050"`                                                                    // Expiration year (four digits).
 	Currency           string        `json:"currency" example:"USD" enums:"USD,EUR,BRL"`                                                    // Currency code in ISO 4217 format (e.g. USD, EUR, BRL).
 	Amount             int64         `json:"amount" example:"1000"`                                                                         // Amount expressed in minor units of the given currency. Example: $10.99 USD → 1099
-	IdempotencyKey     string        `json:"-"`
 }
 
 type PaymentRequest struct {
@@ -72,18 +71,6 @@ type PaymentRequest struct {
 	Currency    string `json:"currency" example:"USD" enums:"USD,EUR,BRL"` // Currency code in ISO 4217 format (e.g. USD, EUR, BRL).
 	Amount      int64  `json:"amount" example:"1000"`                      // Amount expressed in minor units of the given currency. Example: $10.99 USD → 1099
 	CVV         string `json:"cvv" example:"123"`                          // Card verification value (3 or 4 digits).
-
-	IdempotencyKey string `json:"idempotency_key,omitempty" example:"550e8400-e29b-41d4-a716-446655440000"`
-	/*
-		Idempotency key used to safely retry payment requests without creating
-		duplicate payments.
-
-		When the same idempotency key is sent multiple times, the API guarantees
-		that only one payment is created and the same result is returned.
-
-		It is recommended to use a UUID (v4 or v7) or another unique, random value
-		to avoid collisions.
-	*/
 }
 
 func (req PaymentRequest) Validate() error {

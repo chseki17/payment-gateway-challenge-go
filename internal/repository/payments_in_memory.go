@@ -13,14 +13,11 @@ type PaymentID string
 type PaymentsRepositoryInMemory struct {
 	mu       sync.RWMutex
 	payments map[PaymentID]*payments.Payment
-
-	idempotency map[string]PaymentID
 }
 
 func NewPaymentsRepositoryInMemory() *PaymentsRepositoryInMemory {
 	return &PaymentsRepositoryInMemory{
-		payments:    map[PaymentID]*payments.Payment{},
-		idempotency: map[string]PaymentID{},
+		payments: map[PaymentID]*payments.Payment{},
 	}
 }
 
@@ -36,13 +33,6 @@ func (ps *PaymentsRepositoryInMemory) AddPayment(_ context.Context, payment *pay
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
-	existingID, requestAlreadyProcessed := ps.idempotency[payment.IdempotencyKey]
-	if requestAlreadyProcessed {
-		p := ps.payments[existingID]
-		*payment = *p
-		return nil
-	}
-
 	id, err := uuid.NewV7()
 	if err != nil {
 		return err
@@ -50,10 +40,6 @@ func (ps *PaymentsRepositoryInMemory) AddPayment(_ context.Context, payment *pay
 
 	payment.ID = id.String()
 	ps.payments[PaymentID(id.String())] = payment
-
-	if payment.IdempotencyKey != "" {
-		ps.idempotency[payment.IdempotencyKey] = PaymentID(payment.ID)
-	}
 
 	return nil
 }

@@ -52,7 +52,6 @@ func (h *PaymentsHandler) GetHandler() http.HandlerFunc {
 // @Description Creates a new payment and authorizes it with the bank
 // @Description Amount must be expressed in minor units of the currency (e.g. 1099 = $10.99 USD).
 // @Description The only currencies supported for now are USD, EUR, and BRL (ISO 4217).
-// @Description Idempotency key used to safely retry payment requests without creating duplicate payments. It is recommended to use a UUID (v4 or v7) or another unique, random value to avoid collisions.
 // @Tags payments
 // @Accept json
 // @Produce json

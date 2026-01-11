@@ -70,9 +70,6 @@ Several best practices were applied to improve reliability, debuggability, and o
 
 - Context propagation and request timeouts were implemented across the API. HTTP handlers pass the request context down through the application layers, allowing proper cancellation and timely resource cleanup. This follows a well-known Go pattern used by the standard net/http package and database libraries ([see reference](https://go.dev/blog/context-and-structs)).
 
-- To allow consumers of the payment gateway API to safely retry requests and avoid duplicate charges, a basic idempotency mechanism was implemented on the Create payment endpoint.
-Clients can provide an `idempotency_key` in the request payload, and the payment will be processed only once by the acquiring bank.
-
 - The logging setup was improved by adding a middleware that injects a RequestID into each request. This allows logs to be correlated across components, which proved useful during development and would be especially valuable when troubleshooting issues in a production environment.
 
 - A health check endpoint was added to the bank simulator, in addition to the existing ping endpoint. This made it easy to set up a Docker Compose stack to run both projects together and follows a common pattern used in production systems.
@@ -86,6 +83,8 @@ Clients can provide an `idempotency_key` in the request payload, and the payment
 The following items were deliberately left out. Some were omitted to keep the scope reasonable for the challenge, while others depend heavily on expected traffic, business priorities, or operational requirements. I’d discuss these with the team if we make this service production-ready:
 
 - Proposing an asynchronous architecture to improve throughput and maximize payment processing rates. While beneficial for the business, this would introduce additional complexity.
+
+- Implementing full idempotency support for payment creation, allowing clients to safely retry requests without the risk of duplicate charges.
 
 - Adding a circuit breaker around the acquiring bank integration. This would improve resilience and protect the system from failures.
 

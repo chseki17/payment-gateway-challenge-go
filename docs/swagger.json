@@ -10,7 +10,7 @@
     "paths": {
         "/api/v1/payments": {
             "post": {
-                "description": "Creates a new payment and authorizes it with the bank\nAmount must be expressed in minor units of the currency (e.g. 1099 = $10.99 USD).\nThe only currencies supported for now are USD, EUR, and BRL (ISO 4217).\nIdempotency key used to safely retry payment requests without creating duplicate payments. It is recommended to use a UUID (v4 or v7) or another unique, random value to avoid collisions.",
+                "description": "Creates a new payment and authorizes it with the bank\nAmount must be expressed in minor units of the currency (e.g. 1099 = $10.99 USD).\nThe only currencies supported for now are USD, EUR, and BRL (ISO 4217).",
                 "consumes": [
                     "application/json"
                 ],
@@ -213,10 +213,6 @@
                     "description": "Expiration year (four digits).",
                     "type": "integer",
                     "example": 2050
-                },
-                "idempotency_key": {
-                    "type": "string",
-                    "example": "550e8400-e29b-41d4-a716-446655440000"
                 }
             }
         }

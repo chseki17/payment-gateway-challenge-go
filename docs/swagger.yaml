@@ -77,9 +77,6 @@ definitions:
         description: Expiration year (four digits).
         example: 2050
         type: integer
-      idempotency_key:
-        example: 550e8400-e29b-41d4-a716-446655440000
-        type: string
     type: object
 host: localhost:8090
 info:
@@ -95,7 +92,6 @@ paths:
         Creates a new payment and authorizes it with the bank
         Amount must be expressed in minor units of the currency (e.g. 1099 = $10.99 USD).
         The only currencies supported for now are USD, EUR, and BRL (ISO 4217).
-        Idempotency key used to safely retry payment requests without creating duplicate payments. It is recommended to use a UUID (v4 or v7) or another unique, random value to avoid collisions.
       parameters:
       - description: Payment request
         in: body
