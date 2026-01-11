@@ -1,19 +1,18 @@
 # Payment Gateway Challenge
 
-This repository contains the Go implementation of the Payment Gateway challenge. If you haven't already read the [README.md](https://github.com/cko-recruitment/) in the root of this organisation, please do so now.
-
+This repository contains a Go implementation of the Payment Gateway challenge. I followed the requirements described in the [README.md](https://github.com/cko-recruitment/) and start from the golang template given.
 
 ## Running the server
 
 The application is fully containerized. You only need Docker installed (tested with Docker `29.1.1`). To build and start all services:
 
-- `docker compose up`
+- `docker compose up -d`
 
 Once the services are running, the API documentation (Swagger UI) is available at: http://localhost:8090/swagger/index.html
 
 ## Running the tests
 
-A CI pipeline runs all tests automatically, but you can also run them locally. Unit tests:
+A CI pipeline runs all tests automatically using GitHub Actions, but they can also be run locally. Unit tests:
 
 - `go test -v -race ./internal/...`
 
@@ -38,13 +37,13 @@ To meet the functional requirements of the challenge, the API exposes two main e
 - [Retrieve payment details by ID](http://localhost:8090/swagger/index.html#/payments/get_api_v1_payments__id_)
     - This endpoint allows merchants to retrieve payment details using an ID. This can be used for reporting purposes or reconciliation processes, especially when a payment was declined or rejected by the acquiring bank.
 
-Both endpoints are implemented synchronously. However, the system could be evolved to make the Create payment flow asynchronous. This would improve throughput and reduce the risk of losing payments under high load. That said, such a change would introduce additional complexity, such as adding a message broker and a mechanism to notify clients about the final payment result.
+Both endpoints are currently implemented synchronously. However, the Create payment flow could be made asynchronous in the future to improve throughput and reduce the risk of lost payments under high load. This would come at the cost of additional complexity, such as introducing a message broker and a mechanism to notify clients of the final payment result.
 
 ### Project Structure
 
-I aimed to keep the project structure close to the provided template while making a few pragmatic adjustments:
+I kept the project structure mostly aligned with the provided template, with a few pragmatic adjustments:
 
-- Added a `/cmd` directory to organize project binaries. For example, the binary responsible for setting up and running the API server lives here. If a background worker is needed in the future, it could also be added to this directory. This structure follows a well-known Go convention ([reference](https://go.dev/doc/modules/layout#packages-and-commands-in-the-same-repository)).
+- Added a `/cmd` directory to organize project binaries. For example, the binary responsible for setting up and running the API server lives here. If a background worker is needed in the future, it could also be added to this directory. This structure follows a well-known Go convention ([see reference](https://go.dev/doc/modules/layout#packages-and-commands-in-the-same-repository)).
 - Added a `/test/integrations` layer to hold integration tests.
 - Kept the `/internal` directory for implementation details, but with some adjustments. The handler package was moved under the api package, since everything inside api is related to the HTTP interface. Handlers act only as entry points and delegate work to the domain layers.
 - Introduced `banks` and `payments` domain layers. These layers encapsulate domain logic, interfaces (dependencies), and use cases (services), keeping responsibilities well separated and easier to evolve.
@@ -101,3 +100,5 @@ The following items were deliberately left out. Some were omitted to keep the sc
 - Adding rate limiting and retry mechanisms for both the payment gateway and the acquiring bank. Network errors are inevitable in production environments and must be handled gracefully.
 
 - Introducing a caching layer for frequently accessed read operations, depending on the expected read patterns and workload from merchants.
+
+- CI pipeline optimizations were intentionally skipped (such as caching Docker layers or dependencies, or conditionally triggering steps). The pipeline only includes the basic steps required to build and test the application.
