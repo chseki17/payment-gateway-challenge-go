@@ -65,7 +65,7 @@ func main() {
 	paymentsHandler := api.NewPaymentsHandler(paymentsSvc)
 	api := api.New(paymentsHandler)
 
-	if err := api.Run(ctx, ":8090"); err != nil {
+	if err := api.Run(ctx, ":"+conf.App.APIPort); err != nil {
 		log.Fatalf("error setup the API: %v", err)
 	}
 }
