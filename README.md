@@ -1,5 +1,11 @@
 # Payment Gateway Challenge
 
+<p align="center">
+  <a href="https://github.com/chseki17/payment-gateway-challenge-go/actions/workflows/ci.yml">
+    <img src="https://github.com/chseki17/payment-gateway-challenge-go/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI">
+  </a>
+</p>
+
 This repository contains a Go implementation of the Payment Gateway challenge. I followed the requirements described in the [README.md](https://github.com/cko-recruitment/) and start from the golang template given.
 
 ## Running the server
