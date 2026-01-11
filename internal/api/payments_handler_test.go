@@ -218,3 +218,27 @@ func TestPaymentsHandler_GetHandler_Found(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, rec.Code)
 }
+
+func TestPaymentsHandler_GetHandler_NotFound(t *testing.T) {
+	t.Parallel()
+
+	repo := &mockPaymentsRepository{
+		getFn: func(ctx context.Context, id string) (*payments.Payment, error) {
+			return nil, nil
+		},
+	}
+
+	svc := payments.NewService(repo, nil)
+	handler := api.NewPaymentsHandler(svc)
+
+	req := httptest.NewRequest(http.MethodGet, "/payments/123", nil)
+	rec := httptest.NewRecorder()
+
+	rctx := chi.NewRouteContext()
+	rctx.URLParams.Add("id", "123")
+	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+	handler.GetHandler().ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusNotFound, rec.Code)
+}
