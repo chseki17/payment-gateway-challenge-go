@@ -21,6 +21,11 @@ jobs:
       - name: Docker info
         run: docker version
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.0"
+
       # -------------------------
       # Build API image
       # -------------------------
@@ -32,15 +37,11 @@ jobs:
             .
 
       # -------------------------
-      # Unit + integration tests
+      # Unit tests
       # -------------------------
-      - name: Run unit & integration tests (verbose + race)
+      - name: Run unit tests (verbose + race)
         run: |
-          docker run --rm \
-            -v "$PWD":/app \
-            -w /app \
-            golang:1.24.0 \
-            go test -v -race ./internal/...
+          go test -v -race ./internal/...
 
       # -------------------------
       # Swagger generation check
@@ -51,13 +52,13 @@ jobs:
           git diff --exit-code
 
       # -------------------------
-      # E2E tests
+      # Integration tests
       # -------------------------
-      - name: Start stack (E2E)
+      - name: Start stack (Integration tests)
         run: |
           docker compose up -d
 
-      - name: Wait for API to be healthy (E2E)
+      - name: Wait for API to be healthy)
         run: |
           for i in {1..30}; do
             if curl -sf -o /dev/null http://localhost:8090/api/v1/ping; then
@@ -71,18 +72,13 @@ jobs:
           docker compose logs
           exit 1
 
-      - name: Set up Go (E2E)
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.24.0"
-
-      - name: Run tests (E2E)
+      - name: Run integration tests
         env:
           API_BASE_URL: http://localhost:8090
         run: |
-          go test -v ./test/e2e/...
+          go test -v ./test/integration/...
 
-      - name: Tear down stack (E2E)
+      - name: Tear down stack (Integration tests)
         if: always()
         run: |
           docker compose down -v
