@@ -64,6 +64,16 @@ func TestPaymentRequest_Validate(t *testing.T) {
 			expectedField: "expiry_month",
 		},
 		{
+			name: "invalid expiry month at the current month",
+			req: func() payments.PaymentRequest {
+				r := validRequest()
+				r.ExpiryMonth = 1
+				return r
+			},
+			expectErr:     false,
+			expectedField: "expiry_month",
+		},
+		{
 			name: "expiry date in the past",
 			req: func() payments.PaymentRequest {
 				r := validRequest()

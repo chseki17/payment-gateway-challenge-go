@@ -11,6 +11,7 @@ type AppConfig struct {
 	Version     string `envconfig:"APP_VERSION"     default:"v1"`
 	LogLevel    string `envconfig:"APP_LOG_LEVEL"   default:"info"`
 	APIPort     string `envconfig:"APP_API_PORT"    default:"8090"`
+	// todo: APITimeout  string ...
 }
 
 type BankSimulatorConfig struct {

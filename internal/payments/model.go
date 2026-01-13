@@ -55,13 +55,18 @@ func (s PaymentStatus) MarshalJSON() ([]byte, error) {
 }
 
 type Payment struct {
-	ID                 string        `json:"id" example:"019ba901-48a1-7138-824e-d0e65a8dc38a"`                                             // Unique identifier of the payment.
-	Status             PaymentStatus `json:"status" swaggertype:"string" example:"authorized" enums:"authorized,declined,rejected,pending"` // Current status of the payment.
-	CardNumberLastFour string        `json:"card_number_last_four" example:"8877"`                                                          // Last four digits of the card number used in the payment.
-	ExpiryMonth        int           `json:"expiry_month" example:"12"`                                                                     // Expiration month (1–12).
-	ExpiryYear         int           `json:"expiry_year" example:"2050"`                                                                    // Expiration year (four digits).
-	Currency           string        `json:"currency" example:"USD" enums:"USD,EUR,BRL"`                                                    // Currency code in ISO 4217 format (e.g. USD, EUR, BRL).
-	Amount             int64         `json:"amount" example:"1000"`                                                                         // Amount expressed in minor units of the given currency. Example: $10.99 USD → 1099
+	ID     string        `json:"id" example:"019ba901-48a1-7138-824e-d0e65a8dc38a"`                                             // Unique identifier of the payment.
+	Status PaymentStatus `json:"status" swaggertype:"string" example:"authorized" enums:"authorized,declined,rejected,pending"` // Current status of the payment.
+	// TODO: StatusDescription  string one possiblity to distinguich between errors better
+	// StatusErrorCode int
+	// 1 -> represents the card dont have enough money
+	// 2 -> could be validation
+	// and so on...
+	CardNumberLastFour string `json:"card_number_last_four" example:"8877"`       // Last four digits of the card number used in the payment.
+	ExpiryMonth        int    `json:"expiry_month" example:"12"`                  // Expiration month (1–12).
+	ExpiryYear         int    `json:"expiry_year" example:"2050"`                 // Expiration year (four digits).
+	Currency           string `json:"currency" example:"USD" enums:"USD,EUR,BRL"` // Currency code in ISO 4217 format (e.g. USD, EUR, BRL).
+	Amount             int64  `json:"amount" example:"1000"`                      // Amount expressed in minor units of the given currency. Example: $10.99 USD → 1099
 }
 
 type PaymentRequest struct {
@@ -90,9 +95,11 @@ func (req PaymentRequest) Validate() error {
 		}
 	}
 
-	now := time.Now()
+	// TODO: ensure that we test this before ship to production
+	// tip: unit test to enforce different timezones and ensure that UTC is covering everything...
+	now := time.Now().UTC()
 	if req.ExpiryYear < now.Year() ||
-		(req.ExpiryYear == now.Year() && req.ExpiryMonth <= int(now.Month())) {
+		(req.ExpiryYear == now.Year() && req.ExpiryMonth < int(now.Month())) {
 		return &InvalidPaymentRequestErr{
 			Field:   "expiry_date",
 			Message: "expiry date must be in the future",

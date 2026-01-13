@@ -73,7 +73,8 @@ func (a *Api) setupRouter() {
 	a.router.Use(middleware.RequestID)
 	a.router.Use(RequestLogger(logger))
 	a.router.Use(middleware.Recoverer)
-	a.router.Use(middleware.Timeout(60 * time.Second))
+	// TODO: improve this to include dynamic config by environment variable
+	a.router.Use(middleware.Timeout(30 * time.Second))
 
 	a.router.Get("/swagger/*", a.SwaggerHandler())
 
